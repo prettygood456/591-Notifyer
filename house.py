@@ -1,6 +1,9 @@
+import sys
 import os
 import json
 import requests
+from datetime import datetime
+from zoneinfo import ZoneInfo
 from bs4 import BeautifulSoup
 import re
 import gspread
@@ -11,7 +14,7 @@ line_token = os.getenv("LINE_TOKEN")
 
 def lineNotifyMessage(msg, imgUrl):    
     headers = {
-        "Authorization": "Bearer " + token,
+        "Authorization": "Bearer " + line_token,
         "Content-Type": "application/x-www-form-urlencoded",
     }
 
@@ -30,6 +33,14 @@ def lineNotifyMessage(msg, imgUrl):
 
     return req.status_code
 
+# 設定時區為 UTC+8，這裡以台北時間為例
+tz = ZoneInfo("Asia/Taipei")
+
+# 獲取當前時間並轉換到指定時區
+now = datetime.now(tz)
+
+# 格式化時間為更易讀的格式，例如：2024年04月27日 15:30:45 UTC+08:00
+formatted_time = now.strftime("%Y年%m月%d日 %H:%M:%S %Z%z")
 
 # Define the scope
 scope = [
@@ -198,6 +209,7 @@ for property_info in filtered_data:
         property_info["price"],
         "",
         "",
+        formatted_time
     ]
     worksheet.insert_row(row_to_insert, index=2)
 
@@ -229,3 +241,5 @@ for property_info in filtered_data:
         print("訊息已成功發送！")
     else:
         print(f"訊息發送失敗，狀態碼: {status}")
+
+sys.stdout.flush()
