@@ -92,7 +92,7 @@ property_list = []
 # html parser 的結果
 soup_list = []
 
-for ul in urls:
+for url in urls:
     response = requests.get(url=url, headers=headers)
     
     soup_list.append(BeautifulSoup(response.text, "html.parser"))
